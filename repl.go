@@ -59,5 +59,10 @@ func getCommands() map[string]cliCommand {
 			description: "Show usage",
 			callback:    showHelp,
 		},
+		"map": {
+			name:        "map",
+			description: "Show 20 map locations",
+			callback:    showMapLocations,
+		},
 	}
 }
