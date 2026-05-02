@@ -10,7 +10,7 @@ func showPreviousMapLocations(cfg *config) error {
 		return errors.New("you're on the first page")
 	}
 
-	page, err := getLocationAreaPage(cfg.Previous)
+	page, err := getLocationAreaPage(cfg.Previous, cfg.Cache)
 	if err != nil {
 		return err
 	}

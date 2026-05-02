@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/alexmarchi28/pokedexcli/internal/pokecache"
 )
 
 const locationAreaURL = "https://pokeapi.co/api/v2/location-area/"
@@ -26,7 +28,14 @@ type locationArea struct {
 	URL  string `json:"url"`
 }
 
-func getLocationAreaPage(url string) (locationAreaPage, error) {
+func getLocationAreaPage(url string, cache *pokecache.Cache) (locationAreaPage, error) {
+	if cache != nil {
+		body, ok := cache.Get(url)
+		if ok {
+			return parseLocationAreaPage(body)
+		}
+	}
+
 	res, err := http.Get(url)
 	if err != nil {
 		return locationAreaPage{}, err
@@ -42,6 +51,19 @@ func getLocationAreaPage(url string) (locationAreaPage, error) {
 		return locationAreaPage{}, fmt.Errorf("response failed with status code: %d and body: %s", res.StatusCode, body)
 	}
 
+	page, err := parseLocationAreaPage(body)
+	if err != nil {
+		return locationAreaPage{}, err
+	}
+
+	if cache != nil {
+		cache.Add(url, body)
+	}
+
+	return page, nil
+}
+
+func parseLocationAreaPage(body []byte) (locationAreaPage, error) {
 	var locRes locationAreaResponse
 	if err := json.Unmarshal(body, &locRes); err != nil {
 		return locationAreaPage{}, err

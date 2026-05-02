@@ -7,7 +7,7 @@ func showMapLocations(cfg *config) error {
 		cfg.Next = locationAreaURL
 	}
 
-	page, err := getLocationAreaPage(cfg.Next)
+	page, err := getLocationAreaPage(cfg.Next, cfg.Cache)
 	if err != nil {
 		return err
 	}
