@@ -15,11 +15,33 @@ const pokemonURL = "https://pokeapi.co/api/v2/pokemon/"
 type Pokemon struct {
 	Name           string
 	BaseExperience int
+	Height         int
+	Weight         int
+	Stats          []PokemonStat
+	Types          []string
+}
+
+type PokemonStat struct {
+	Name  string
+	Value int
 }
 
 type pokemonResponse struct {
 	Name           string `json:"name"`
 	BaseExperience int    `json:"base_experience"`
+	Height         int    `json:"height"`
+	Weight         int    `json:"weight"`
+	Stats          []struct {
+		BaseStat int `json:"base_stat"`
+		Stat     struct {
+			Name string `json:"name"`
+		} `json:"stat"`
+	} `json:"stats"`
+	Types []struct {
+		Type struct {
+			Name string `json:"name"`
+		} `json:"type"`
+	} `json:"types"`
 }
 
 func getPokemon(name string, cache *pokecache.Cache) (Pokemon, error) {
@@ -63,14 +85,56 @@ func getPokemon(name string, cache *pokecache.Cache) (Pokemon, error) {
 	return pokemon, nil
 }
 
+func getCachedPokemon(name string, cache *pokecache.Cache) (Pokemon, bool) {
+	if cache == nil {
+		return Pokemon{}, false
+	}
+
+	pokemonEndpointURL := pokemonURL + url.PathEscape(name)
+	body, ok := cache.Get(pokemonEndpointURL)
+	if !ok {
+		return Pokemon{}, false
+	}
+
+	pokemon, err := parsePokemon(body)
+	if err != nil {
+		return Pokemon{}, false
+	}
+
+	return pokemon, true
+}
+
 func parsePokemon(body []byte) (Pokemon, error) {
 	var pokemonRes pokemonResponse
 	if err := json.Unmarshal(body, &pokemonRes); err != nil {
 		return Pokemon{}, err
 	}
 
+	stats := make([]PokemonStat, 0, len(pokemonRes.Stats))
+	for _, stat := range pokemonRes.Stats {
+		if stat.Stat.Name == "" {
+			continue
+		}
+		stats = append(stats, PokemonStat{
+			Name:  stat.Stat.Name,
+			Value: stat.BaseStat,
+		})
+	}
+
+	types := make([]string, 0, len(pokemonRes.Types))
+	for _, pokemonType := range pokemonRes.Types {
+		if pokemonType.Type.Name == "" {
+			continue
+		}
+		types = append(types, pokemonType.Type.Name)
+	}
+
 	return Pokemon{
 		Name:           pokemonRes.Name,
 		BaseExperience: pokemonRes.BaseExperience,
+		Height:         pokemonRes.Height,
+		Weight:         pokemonRes.Weight,
+		Stats:          stats,
+		Types:          types,
 	}, nil
 }
