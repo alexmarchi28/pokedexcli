@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func showPreviousMapLocations(cfg *config) error {
+func showPreviousMapLocations(cfg *config, _ ...string) error {
 	if cfg.Previous == "" {
 		return errors.New("you're on the first page")
 	}

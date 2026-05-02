@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func showMapLocations(cfg *config) error {
+func showMapLocations(cfg *config, _ ...string) error {
 	if cfg.Next == "" {
 		cfg.Next = locationAreaURL
 	}
