@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 	"github.com/alexmarchi28/pokedexcli/internal/pokecache"
 )
 
-const pokemonURL = "https://pokeapi.co/api/v2/pokemon/"
+const PokemonURL = "https://pokeapi.co/api/v2/pokemon/"
 
 type Pokemon struct {
 	Name           string
@@ -44,13 +44,13 @@ type pokemonResponse struct {
 	} `json:"types"`
 }
 
-func getPokemon(name string, cache *pokecache.Cache) (Pokemon, error) {
-	pokemonEndpointURL := pokemonURL + url.PathEscape(name)
+func GetPokemon(name string, cache *pokecache.Cache) (Pokemon, error) {
+	pokemonEndpointURL := PokemonURL + url.PathEscape(name)
 
 	if cache != nil {
 		body, ok := cache.Get(pokemonEndpointURL)
 		if ok {
-			return parsePokemon(body)
+			return ParsePokemon(body)
 		}
 	}
 
@@ -73,7 +73,7 @@ func getPokemon(name string, cache *pokecache.Cache) (Pokemon, error) {
 		return Pokemon{}, fmt.Errorf("response failed with status code: %d and body: %s", res.StatusCode, body)
 	}
 
-	pokemon, err := parsePokemon(body)
+	pokemon, err := ParsePokemon(body)
 	if err != nil {
 		return Pokemon{}, err
 	}
@@ -85,18 +85,18 @@ func getPokemon(name string, cache *pokecache.Cache) (Pokemon, error) {
 	return pokemon, nil
 }
 
-func getCachedPokemon(name string, cache *pokecache.Cache) (Pokemon, bool) {
+func GetCachedPokemon(name string, cache *pokecache.Cache) (Pokemon, bool) {
 	if cache == nil {
 		return Pokemon{}, false
 	}
 
-	pokemonEndpointURL := pokemonURL + url.PathEscape(name)
+	pokemonEndpointURL := PokemonURL + url.PathEscape(name)
 	body, ok := cache.Get(pokemonEndpointURL)
 	if !ok {
 		return Pokemon{}, false
 	}
 
-	pokemon, err := parsePokemon(body)
+	pokemon, err := ParsePokemon(body)
 	if err != nil {
 		return Pokemon{}, false
 	}
@@ -104,7 +104,7 @@ func getCachedPokemon(name string, cache *pokecache.Cache) (Pokemon, bool) {
 	return pokemon, true
 }
 
-func parsePokemon(body []byte) (Pokemon, error) {
+func ParsePokemon(body []byte) (Pokemon, error) {
 	var pokemonRes pokemonResponse
 	if err := json.Unmarshal(body, &pokemonRes); err != nil {
 		return Pokemon{}, err

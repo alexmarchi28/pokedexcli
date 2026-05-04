@@ -1,19 +1,21 @@
-package main
+package commands
 
 import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/alexmarchi28/pokedexcli/internal/utils"
 )
 
-func exploreLocationArea(cfg *config, args ...string) error {
+func ExploreLocationArea(cfg *Config, args ...string) error {
 	if len(args) == 0 {
 		return errors.New("you must provide a location area")
 	}
 
 	locationAreaName := strings.Join(args, "-")
 
-	details, err := getLocationAreaDetails(locationAreaName, cfg.Cache)
+	details, err := utils.GetLocationAreaDetails(locationAreaName, cfg.Cache)
 	if err != nil {
 		return err
 	}

@@ -1,19 +1,21 @@
-package main
+package commands
 
 import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/alexmarchi28/pokedexcli/internal/utils"
 )
 
-func inspectPokemon(cfg *config, args ...string) error {
+func InspectPokemon(cfg *Config, args ...string) error {
 	if len(args) == 0 {
 		return errors.New("you must provide a pokemon name")
 	}
 
 	pokemonName := strings.Join(args, "-")
 	if cfg.Pokedex == nil {
-		cfg.Pokedex = make(map[string]Pokemon)
+		cfg.Pokedex = make(map[string]utils.Pokemon)
 	}
 
 	caughtPokemon, ok := cfg.Pokedex[pokemonName]
@@ -23,7 +25,7 @@ func inspectPokemon(cfg *config, args ...string) error {
 	}
 
 	pokemon := caughtPokemon
-	cachedPokemon, ok := getCachedPokemon(pokemonName, cfg.Cache)
+	cachedPokemon, ok := utils.GetCachedPokemon(pokemonName, cfg.Cache)
 	if ok {
 		pokemon = cachedPokemon
 	}
@@ -32,7 +34,7 @@ func inspectPokemon(cfg *config, args ...string) error {
 	return nil
 }
 
-func printPokemonDetails(pokemon Pokemon) {
+func printPokemonDetails(pokemon utils.Pokemon) {
 	fmt.Printf("Name: %s\n", pokemon.Name)
 	fmt.Printf("Height: %d\n", pokemon.Height)
 	fmt.Printf("Weight: %d\n", pokemon.Weight)

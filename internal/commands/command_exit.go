@@ -1,11 +1,11 @@
-package main
+package commands
 
 import (
 	"fmt"
 	"os"
 )
 
-func commandExit(_ *config, _ ...string) error {
+func CommandExit(_ *Config, _ ...string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil

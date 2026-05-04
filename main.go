@@ -1,5 +1,7 @@
 package main
 
+import "github.com/alexmarchi28/pokedexcli/internal/repl"
+
 func main() {
-	startRepl()
+	repl.Start()
 }

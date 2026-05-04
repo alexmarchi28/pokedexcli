@@ -1,13 +1,15 @@
-package pokecache
+package tests
 
 import (
 	"bytes"
 	"testing"
 	"time"
+
+	"github.com/alexmarchi28/pokedexcli/internal/pokecache"
 )
 
 func TestCacheAddGet(t *testing.T) {
-	cache := NewCache(5 * time.Minute)
+	cache := pokecache.NewCache(5 * time.Minute)
 	key := "https://example.com/location-area"
 	val := []byte("cached response")
 
@@ -25,7 +27,7 @@ func TestCacheAddGet(t *testing.T) {
 
 func TestCacheReapsOldEntries(t *testing.T) {
 	const interval = 10 * time.Millisecond
-	cache := NewCache(interval)
+	cache := pokecache.NewCache(interval)
 	key := "https://example.com/location-area"
 
 	cache.Add(key, []byte("cached response"))

@@ -1,16 +1,18 @@
-package main
+package commands
 
 import (
 	"errors"
 	"fmt"
+
+	"github.com/alexmarchi28/pokedexcli/internal/utils"
 )
 
-func showPreviousMapLocations(cfg *config, _ ...string) error {
+func ShowPreviousMapLocations(cfg *Config, _ ...string) error {
 	if cfg.Previous == "" {
 		return errors.New("you're on the first page")
 	}
 
-	page, err := getLocationAreaPage(cfg.Previous, cfg.Cache)
+	page, err := utils.GetLocationAreaPage(cfg.Previous, cfg.Cache)
 	if err != nil {
 		return err
 	}

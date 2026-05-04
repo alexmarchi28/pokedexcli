@@ -1,11 +1,11 @@
-package main
+package commands
 
 import (
 	"fmt"
 	"sort"
 )
 
-func showPokedex(cfg *config, _ ...string) error {
+func ShowPokedex(cfg *Config, _ ...string) error {
 	fmt.Println("Your Pokedex:")
 
 	names := make([]string, 0, len(cfg.Pokedex))

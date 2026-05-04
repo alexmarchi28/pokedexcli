@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"encoding/json"
@@ -10,9 +10,9 @@ import (
 	"github.com/alexmarchi28/pokedexcli/internal/pokecache"
 )
 
-const locationAreaURL = "https://pokeapi.co/api/v2/location-area/"
+const LocationAreaURL = "https://pokeapi.co/api/v2/location-area/"
 
-type locationAreaPage struct {
+type LocationAreaPage struct {
 	Next     string
 	Previous string
 	Names    []string
@@ -29,7 +29,7 @@ type locationArea struct {
 	URL  string `json:"url"`
 }
 
-type locationAreaDetails struct {
+type LocationAreaDetails struct {
 	Name         string
 	PokemonNames []string
 }
@@ -48,32 +48,32 @@ type locationPokemon struct {
 	URL  string `json:"url"`
 }
 
-func getLocationAreaPage(url string, cache *pokecache.Cache) (locationAreaPage, error) {
+func GetLocationAreaPage(url string, cache *pokecache.Cache) (LocationAreaPage, error) {
 	if cache != nil {
 		body, ok := cache.Get(url)
 		if ok {
-			return parseLocationAreaPage(body)
+			return ParseLocationAreaPage(body)
 		}
 	}
 
 	res, err := http.Get(url)
 	if err != nil {
-		return locationAreaPage{}, err
+		return LocationAreaPage{}, err
 	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return locationAreaPage{}, err
+		return LocationAreaPage{}, err
 	}
 
 	if res.StatusCode > 299 {
-		return locationAreaPage{}, fmt.Errorf("response failed with status code: %d and body: %s", res.StatusCode, body)
+		return LocationAreaPage{}, fmt.Errorf("response failed with status code: %d and body: %s", res.StatusCode, body)
 	}
 
-	page, err := parseLocationAreaPage(body)
+	page, err := ParseLocationAreaPage(body)
 	if err != nil {
-		return locationAreaPage{}, err
+		return LocationAreaPage{}, err
 	}
 
 	if cache != nil {
@@ -83,10 +83,10 @@ func getLocationAreaPage(url string, cache *pokecache.Cache) (locationAreaPage, 
 	return page, nil
 }
 
-func parseLocationAreaPage(body []byte) (locationAreaPage, error) {
+func ParseLocationAreaPage(body []byte) (LocationAreaPage, error) {
 	var locRes locationAreaResponse
 	if err := json.Unmarshal(body, &locRes); err != nil {
-		return locationAreaPage{}, err
+		return LocationAreaPage{}, err
 	}
 
 	names := make([]string, 0, len(locRes.Results))
@@ -94,45 +94,45 @@ func parseLocationAreaPage(body []byte) (locationAreaPage, error) {
 		names = append(names, location.Name)
 	}
 
-	return locationAreaPage{
+	return LocationAreaPage{
 		Next:     locRes.Next,
 		Previous: locRes.Previous,
 		Names:    names,
 	}, nil
 }
 
-func getLocationAreaDetails(name string, cache *pokecache.Cache) (locationAreaDetails, error) {
-	locationURL := locationAreaURL + url.PathEscape(name)
+func GetLocationAreaDetails(name string, cache *pokecache.Cache) (LocationAreaDetails, error) {
+	locationURL := LocationAreaURL + url.PathEscape(name)
 
 	if cache != nil {
 		body, ok := cache.Get(locationURL)
 		if ok {
-			return parseLocationAreaDetails(body)
+			return ParseLocationAreaDetails(body)
 		}
 	}
 
 	res, err := http.Get(locationURL)
 	if err != nil {
-		return locationAreaDetails{}, err
+		return LocationAreaDetails{}, err
 	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return locationAreaDetails{}, err
+		return LocationAreaDetails{}, err
 	}
 
 	if res.StatusCode == http.StatusNotFound {
-		return locationAreaDetails{}, fmt.Errorf("location area %q not found", name)
+		return LocationAreaDetails{}, fmt.Errorf("location area %q not found", name)
 	}
 
 	if res.StatusCode > 299 {
-		return locationAreaDetails{}, fmt.Errorf("response failed with status code: %d and body: %s", res.StatusCode, body)
+		return LocationAreaDetails{}, fmt.Errorf("response failed with status code: %d and body: %s", res.StatusCode, body)
 	}
 
-	details, err := parseLocationAreaDetails(body)
+	details, err := ParseLocationAreaDetails(body)
 	if err != nil {
-		return locationAreaDetails{}, err
+		return LocationAreaDetails{}, err
 	}
 
 	if cache != nil {
@@ -142,10 +142,10 @@ func getLocationAreaDetails(name string, cache *pokecache.Cache) (locationAreaDe
 	return details, nil
 }
 
-func parseLocationAreaDetails(body []byte) (locationAreaDetails, error) {
+func ParseLocationAreaDetails(body []byte) (LocationAreaDetails, error) {
 	var locRes locationAreaDetailsResponse
 	if err := json.Unmarshal(body, &locRes); err != nil {
-		return locationAreaDetails{}, err
+		return LocationAreaDetails{}, err
 	}
 
 	names := make([]string, 0, len(locRes.PokemonEncounters))
@@ -156,7 +156,7 @@ func parseLocationAreaDetails(body []byte) (locationAreaDetails, error) {
 		names = append(names, encounter.Pokemon.Name)
 	}
 
-	return locationAreaDetails{
+	return LocationAreaDetails{
 		Name:         locRes.Name,
 		PokemonNames: names,
 	}, nil

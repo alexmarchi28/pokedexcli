@@ -1,6 +1,10 @@
-package main
+package tests
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/alexmarchi28/pokedexcli/internal/utils"
+)
 
 func TestParseLocationAreaDetails(t *testing.T) {
 	body := []byte(`{
@@ -21,7 +25,7 @@ func TestParseLocationAreaDetails(t *testing.T) {
 		]
 	}`)
 
-	actual, err := parseLocationAreaDetails(body)
+	actual, err := utils.ParseLocationAreaDetails(body)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

@@ -1,4 +1,4 @@
-package main
+package tests
 
 import (
 	"io"
@@ -6,16 +6,18 @@ import (
 	"testing"
 	"time"
 
+	"github.com/alexmarchi28/pokedexcli/internal/commands"
 	"github.com/alexmarchi28/pokedexcli/internal/pokecache"
+	"github.com/alexmarchi28/pokedexcli/internal/utils"
 )
 
 func TestInspectPokemonRequiresCaughtPokemon(t *testing.T) {
-	cfg := &config{
-		Pokedex: make(map[string]Pokemon),
+	cfg := &commands.Config{
+		Pokedex: make(map[string]utils.Pokemon),
 	}
 
 	output := captureOutput(t, func() {
-		err := inspectPokemon(cfg, "pidgey")
+		err := commands.InspectPokemon(cfg, "pidgey")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -29,7 +31,7 @@ func TestInspectPokemonRequiresCaughtPokemon(t *testing.T) {
 
 func TestInspectPokemonUsesCacheForCaughtPokemon(t *testing.T) {
 	cache := pokecache.NewCache(5 * time.Minute)
-	cache.Add(pokemonURL+"pidgey", []byte(`{
+	cache.Add(utils.PokemonURL+"pidgey", []byte(`{
 		"name": "pidgey",
 		"base_experience": 50,
 		"height": 3,
@@ -62,9 +64,9 @@ func TestInspectPokemonUsesCacheForCaughtPokemon(t *testing.T) {
 		]
 	}`))
 
-	cfg := &config{
+	cfg := &commands.Config{
 		Cache: cache,
-		Pokedex: map[string]Pokemon{
+		Pokedex: map[string]utils.Pokemon{
 			"pidgey": {
 				Name:   "pidgey",
 				Height: 999,
@@ -74,7 +76,7 @@ func TestInspectPokemonUsesCacheForCaughtPokemon(t *testing.T) {
 	}
 
 	output := captureOutput(t, func() {
-		err := inspectPokemon(cfg, "pidgey")
+		err := commands.InspectPokemon(cfg, "pidgey")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -96,13 +98,13 @@ Types:
 }
 
 func TestInspectPokemonUsesPokedexWhenCacheMisses(t *testing.T) {
-	cfg := &config{
-		Pokedex: map[string]Pokemon{
+	cfg := &commands.Config{
+		Pokedex: map[string]utils.Pokemon{
 			"pidgey": {
 				Name:   "pidgey",
 				Height: 3,
 				Weight: 18,
-				Stats: []PokemonStat{
+				Stats: []utils.PokemonStat{
 					{Name: "hp", Value: 40},
 				},
 				Types: []string{"normal"},
@@ -111,7 +113,7 @@ func TestInspectPokemonUsesPokedexWhenCacheMisses(t *testing.T) {
 	}
 
 	output := captureOutput(t, func() {
-		err := inspectPokemon(cfg, "pidgey")
+		err := commands.InspectPokemon(cfg, "pidgey")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

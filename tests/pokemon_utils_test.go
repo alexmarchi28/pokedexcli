@@ -1,6 +1,11 @@
-package main
+package tests
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/alexmarchi28/pokedexcli/internal/commands"
+	"github.com/alexmarchi28/pokedexcli/internal/utils"
+)
 
 func TestParsePokemon(t *testing.T) {
 	body := []byte(`{
@@ -31,7 +36,7 @@ func TestParsePokemon(t *testing.T) {
 		]
 	}`)
 
-	actual, err := parsePokemon(body)
+	actual, err := utils.ParsePokemon(body)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -99,7 +104,7 @@ func TestCatchChancePercentage(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			actual := catchChancePercentage(c.baseExperience)
+			actual := commands.CatchChancePercentage(c.baseExperience)
 			if actual != c.expected {
 				t.Fatalf("expected %d, got %d", c.expected, actual)
 			}

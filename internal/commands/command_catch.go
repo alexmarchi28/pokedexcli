@@ -1,19 +1,21 @@
-package main
+package commands
 
 import (
 	"errors"
 	"fmt"
 	"math/rand"
 	"strings"
+
+	"github.com/alexmarchi28/pokedexcli/internal/utils"
 )
 
-func catchPokemon(cfg *config, args ...string) error {
+func CatchPokemon(cfg *Config, args ...string) error {
 	if len(args) == 0 {
 		return errors.New("you must provide a pokemon name")
 	}
 
 	pokemonName := strings.Join(args, "-")
-	pokemon, err := getPokemon(pokemonName, cfg.Cache)
+	pokemon, err := utils.GetPokemon(pokemonName, cfg.Cache)
 	if err != nil {
 		return err
 	}
@@ -26,7 +28,7 @@ func catchPokemon(cfg *config, args ...string) error {
 	}
 
 	if cfg.Pokedex == nil {
-		cfg.Pokedex = make(map[string]Pokemon)
+		cfg.Pokedex = make(map[string]utils.Pokemon)
 	}
 	cfg.Pokedex[pokemon.Name] = pokemon
 
@@ -35,10 +37,10 @@ func catchPokemon(cfg *config, args ...string) error {
 }
 
 func pokemonWasCaught(baseExperience int) bool {
-	return rand.Intn(100) < catchChancePercentage(baseExperience)
+	return rand.Intn(100) < CatchChancePercentage(baseExperience)
 }
 
-func catchChancePercentage(baseExperience int) int {
+func CatchChancePercentage(baseExperience int) int {
 	const (
 		maxChance                 = 80
 		minChance                 = 30

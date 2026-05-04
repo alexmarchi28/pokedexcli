@@ -1,8 +1,9 @@
-package main
+package tests
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/alexmarchi28/pokedexcli/internal/utils"
 )
 
 func TestCleanInput(t *testing.T) {
@@ -29,7 +30,7 @@ func TestCleanInput(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		actual := cleanInput(c.input)
+		actual := utils.CleanInput(c.input)
 		if len(actual) != len(c.expected) {
 			t.Errorf("lengths don't match: '%v' vs '%v'", actual, c.expected)
 			continue
@@ -37,8 +38,6 @@ func TestCleanInput(t *testing.T) {
 		for i := range actual {
 			word := actual[i]
 			expectedWord := c.expected[i]
-			fmt.Println(word)
-			fmt.Println(expectedWord)
 			if word != expectedWord {
 				t.Errorf("expected: %v, got: %v", expectedWord, word)
 			}

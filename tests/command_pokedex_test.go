@@ -1,17 +1,22 @@
-package main
+package tests
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/alexmarchi28/pokedexcli/internal/commands"
+	"github.com/alexmarchi28/pokedexcli/internal/utils"
+)
 
 func TestShowPokedexListsCaughtPokemon(t *testing.T) {
-	cfg := &config{
-		Pokedex: map[string]Pokemon{
+	cfg := &commands.Config{
+		Pokedex: map[string]utils.Pokemon{
 			"pidgey":  {Name: "pidgey"},
 			"pikachu": {Name: "pikachu"},
 		},
 	}
 
 	output := captureOutput(t, func() {
-		err := showPokedex(cfg)
+		err := commands.ShowPokedex(cfg)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -27,10 +32,10 @@ func TestShowPokedexListsCaughtPokemon(t *testing.T) {
 }
 
 func TestShowPokedexHandlesNoCaughtPokemon(t *testing.T) {
-	cfg := &config{}
+	cfg := &commands.Config{}
 
 	output := captureOutput(t, func() {
-		err := showPokedex(cfg)
+		err := commands.ShowPokedex(cfg)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
